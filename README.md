@@ -12,3 +12,9 @@ python -m pip install psycopg2-binary Pillow
 
 # POSTGRESQL V14 INSTALL
 http://sbp.enterprisedb.com/getfile.jsp?fileid=1258098
+
+
+
+
+# DBEAVER INSTALL
+https://dbeaver.io/files/dbeaver-ce-latest-x86_64-setup.exe
