@@ -53,7 +53,7 @@ class DatabaseProject:
         query = self.list_box.get(ACTIVE)
         if query:
             id = query[0]
-            self.curs.execute("DELETE FROM Pizzas WHERE studId=(%s)", (id,))
+            self.curs.execute("DELETE FROM Pizzas WHERE pizza_name=(%s)", (id,))
             self.conn.commit()
             self.list_box.delete(ACTIVE)
             messagebox.showinfo('Pizza Deleted', query + ' Pizza with Allergen Deleted')
@@ -68,17 +68,17 @@ class DatabaseProject:
         value = str(len(self.curs.fetchall()) + 1)
 
         ttk.Label(self.addData_Window, text='Pizzas Names: ').grid(row=1, column=0)
-        self.id = ttk.Entry(self.addData_Window)
-        self.id.grid(row=1, column=1)
-        self.id.insert(0, value)
+        self.pizza_name = ttk.Entry(self.addData_Window)
+        self.pizza_name.grid(row=1, column=1)
+        self.pizza_name.insert(0, value)
 
         ttk.Label(self.addData_Window, text='first_ingredient: ').grid(row=2, column=0)
-        self.first_name = ttk.Entry(self.addData_Window)
-        self.first_name.grid(row=2, column=1)
+        self.first_ingredient = ttk.Entry(self.addData_Window)
+        self.first_ingredient.grid(row=2, column=1)
 
         ttk.Label(self.addData_Window, text='second_ingredient: ').grid(row=3, column=0)
-        self.middle_name = ttk.Entry(self.addData_Window)
-        self.middle_name.grid(row=3, column=1)
+        self.second_ingredient = ttk.Entry(self.addData_Window)
+        self.second_ingredient.grid(row=3, column=1)
 
         ttk.Label(self.addData_Window, text='third_ingredient: ').grid(row=4, column=0)
         self.last_name = ttk.Entry(self.addData_Window)
@@ -111,7 +111,7 @@ class DatabaseProject:
                           self.address.get(), self.phone_no.get(), self.dob.get(), self.class_name.get(),
                           self.roll_no.get(), self.gender.get(), self.photo_label['text'].rstrip())
             print(self.photo_label['text'])
-            self.curs.execute("INSERT INTO Pizzas VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", parameters)
+            self.curs.execute("INSERT INTO Pizzas VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", parameters)
             self.conn.commit()
             parameters = (self.id, self.first_name, self.middle_name, self.last_name, self.address, self.phone_no,
                           self.dob, self.class_name, self.roll_no, self.gender)
@@ -138,7 +138,7 @@ class DatabaseProject:
             self.data_show_window.destroy()
         if query:    
             id = query[0]
-            self.curs.execute("SELECT * FROM Pizzas WHERE studId=(%s)", (id,))
+            self.curs.execute("SELECT * FROM Pizzas WHERE pizza_name=(%s)", (id,))
             rows = self.curs.fetchall()
             for data in rows:
                 if data[10]:
@@ -190,8 +190,8 @@ class DatabaseProject:
         query = self.list_box.get(ACTIVE)
         if not query:
             self.update_data_window.destroy()
-        self.studid = query[0]
-        self.curs.execute("SELECT * FROM Pizzas WHERE studId=(%s)", (self.studid,))
+        self.pizza_name = query[0]
+        self.curs.execute("SELECT * FROM Pizzas WHERE pizza_name=(%s)", (self.pizza_name,))
         rows = self.curs.fetchall()
         for data in rows:
             if data[10]:
@@ -257,23 +257,21 @@ class DatabaseProject:
             self.gender1.grid(row=9, column=1)
             self.gender1.insert(0, data[9])
 
-        self.update_button = ttk.Button(frame, text='Update Data',
-                                        command=lambda: self.update_data()).grid(row=11,
+        self.update_button = ttk.Button(frame, text='Update Data', command=lambda: self.update_data()).grid(row=11,
                                                                                  column=1)
         ttk.Button(self.update_data_window, text='Close', command=lambda: self.update_data_window.destroy()).grid(
-            row=12,
-            column=1)
+            row=12, column=1)
 
     # update the details of the Pizzas on the list box and also database
     def update_data(self):
         update_values = (self.first_name1.get(), self.middle_name1.get(), self.last_name1.get(),
                          self.address1.get(), self.phone_no1.get(), self.dob1.get(), self.class_name1.get(),
-                         self.roll_no1.get(), self.gender1.get(), self.photo_label['text'].rstrip(), self.studid)
+                         self.roll_no1.get(), self.gender1.get(), self.photo_label['text'].rstrip(), self.pizza_name)
         self.curs.execute("UPDATE Pizzas SET first_name=%s, middle_name=%s, last_name=%s, address=%s, phone_no=%s, "
-                          "dob=%s, class=%s, rollno=%s, gender=%s, photo=%s WHERE studId=%s", update_values)
+                          "dob=%s, class=%s, rollno=%s, gender=%s, photo=%s WHERE pizza_name=%s", update_values)
         self.conn.commit()
         self.list_all()
-        self.curs.execute("SELECT * FROM Pizzas WHERE studId=(%s)", (self.studid,))
+        self.curs.execute("SELECT * FROM Pizzas WHERE pizza_name=(%s)", (self.pizza_name,))
         rows = self.curs.fetchall()
         for data in rows:
             self.id1['text'] = ''
