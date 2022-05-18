@@ -2,6 +2,7 @@ import psycopg2
 from tkinter import *
 from tkinter import ttk, messagebox, filedialog
 from PIL import Image, ImageTk
+from PIL.Image import Resampling
 
 
 class DatabaseProject:
@@ -11,7 +12,11 @@ class DatabaseProject:
 
     def __init__(self, window):
         # connect database
-        self.conn = psycopg2.connect("host='localhost' dbname='dbpizzaprojecthft' user='bruno' password='admin'")
+        try:
+            self.conn = psycopg2.connect("host='localhost' dbname='dbpizzaprojecthft' user='bruno' password='admin'")
+            print("Successfully connected to the Pizza PostgreSQL DataBase.")
+        except psycopg2.ProgrammingError:
+            print("I am unable to connect to the database")
         self.curs = self.conn.cursor()
         try:
             pass
@@ -19,10 +24,9 @@ class DatabaseProject:
             with self.conn as cursor:
                 cursor.execute(open('pizza_schema.sql', 'r').read())
 
-
         # configure window, buttons and Entry
-        window.title('PizzasManagement')
-        window.geometry('400x400')
+        window.title('The Ultimate Pizza Selector')
+        window.geometry('450x450')
         style = ttk.Style()
         style.configure("TButton", font="Serif 10", padding=10)
         style.configure("TEntry", font="Serif 10", padding=10)
@@ -30,19 +34,19 @@ class DatabaseProject:
         bottomFrame.pack(side=BOTTOM)
 
         ttk.Label(window, text="Pizzas List").pack()
-        self.list_box = Listbox(window, selectmode=EXTENDED, width=50)
+        self.list_box = Listbox(window, selectmode=EXTENDED, width=65)
         self.list_box.pack()
         self.list_all()
 
-        self.Pizzas_button = ttk.Button(window, text='Add Data', command=lambda: self.enter_data()).pack(side=LEFT)
-        self.show_button = ttk.Button(window, text='Show Details', command=lambda: self.show_data()).pack(side=LEFT)
-        self.delete_button = ttk.Button(window, text='Delete', command=lambda: self.delete_data()).pack(side=LEFT)
-        self.update_button = ttk.Button(window, text='Update', command=lambda: self.update()).pack(side=LEFT)
+        self.Pizzas_button = ttk.Button(window, text='Add a pizza', command=lambda: self.enter_data()).pack(side=LEFT)
+        self.show_button = ttk.Button(window, text='Show pizza details', command=lambda: self.show_data()).pack(side=LEFT)
+        self.delete_button = ttk.Button(window, text='Delete pizza', command=lambda: self.delete_data()).pack(side=RIGHT)
+        self.update_button = ttk.Button(window, text='Update pizza list', command=lambda: self.update()).pack(side=RIGHT)
         ttk.Button(bottomFrame, text='Close', command=lambda: self.close_connection(window)).pack()
 
     # list all data in listbox
     def list_all(self):
-        self.curs.execute("""SELECT * FROM Pizzas""")
+        self.curs.execute("SELECT * FROM Pizzas")
         self.list_box.delete(0, END)
         rows = self.curs.fetchall()
         for row in rows:
@@ -53,10 +57,10 @@ class DatabaseProject:
         query = self.list_box.get(ACTIVE)
         if query:
             id = query[0]
-            self.curs.execute("DELETE FROM Pizzas WHERE pizza_name=(%s)", (id,))
+            self.curs.execute("DELETE FROM Pizzas WHERE pizza_id=(%s)", (id,))
             self.conn.commit()
             self.list_box.delete(ACTIVE)
-            messagebox.showinfo('Pizza Deleted', query + ' Pizza with Allergen Deleted')
+            messagebox.showinfo('Pizza Deleted', 'The pizza ' + query[1] + ' is updated')
 
     # enter data on entry boxes
     def enter_data(self):
@@ -64,265 +68,245 @@ class DatabaseProject:
         # self.addData_Window.geometry('800x400')
         self.addData_Window.title('Add Pizzas Data')
 
-        self.curs.execute("""SELECT * FROM Pizzas""")
+        self.curs.execute("SELECT * FROM Pizzas")
         value = str(len(self.curs.fetchall()) + 1)
 
-        ttk.Label(self.addData_Window, text='Pizzas Names: ').grid(row=1, column=0)
+        ttk.Label(self.addData_Window, text='Pizza ID: ').grid(row=1, column=0)
+        self.id = ttk.Entry(self.addData_Window)
+        self.id.grid(row=1, column=1)
+        self.id.insert(0, value)
+
+        ttk.Label(self.addData_Window, text='Pizza Name: ').grid(row=2, column=0)
         self.pizza_name = ttk.Entry(self.addData_Window)
-        self.pizza_name.grid(row=1, column=1)
-        self.pizza_name.insert(0, value)
+        self.pizza_name.grid(row=2, column=1)
 
-        ttk.Label(self.addData_Window, text='first_ingredient: ').grid(row=2, column=0)
+        ttk.Label(self.addData_Window, text='First Ingredient: ').grid(row=3, column=0)
         self.first_ingredient = ttk.Entry(self.addData_Window)
-        self.first_ingredient.grid(row=2, column=1)
+        self.first_ingredient.grid(row=3, column=1)
 
-        ttk.Label(self.addData_Window, text='second_ingredient: ').grid(row=3, column=0)
+        ttk.Label(self.addData_Window, text='Second Ingredient: ').grid(row=4, column=0)
         self.second_ingredient = ttk.Entry(self.addData_Window)
-        self.second_ingredient.grid(row=3, column=1)
+        self.second_ingredient.grid(row=4, column=1)
 
-        ttk.Label(self.addData_Window, text='third_ingredient: ').grid(row=4, column=0)
-        self.last_name = ttk.Entry(self.addData_Window)
-        self.last_name.grid(row=4, column=1)
+        ttk.Label(self.addData_Window, text='Third Ingredient: ').grid(row=5, column=0)
+        self.third_ingredient = ttk.Entry(self.addData_Window)
+        self.third_ingredient.grid(row=5, column=1)
 
-        ttk.Label(self.addData_Window, text='fourth_ingredient: ').grid(row=5, column=0)
-        self.address = ttk.Entry(self.addData_Window)
-        self.address.grid(row=5, column=1)
+        ttk.Label(self.addData_Window, text='Fourth Ingredient: ').grid(row=6, column=0)
+        self.fourth_ingredient = ttk.Entry(self.addData_Window)
+        self.fourth_ingredient.grid(row=6, column=1)
 
-        ttk.Label(self.addData_Window, text='fifth_ingredient: ').grid(row=6, column=0)
-        self.phone_no = ttk.Entry(self.addData_Window)
-        self.phone_no.grid(row=6, column=1)
+        ttk.Label(self.addData_Window, text='Fifth Ingredient: ').grid(row=7, column=0)
+        self.fifth_ingredient = ttk.Entry(self.addData_Window)
+        self.fifth_ingredient.grid(row=7, column=1)
 
-        ttk.Label(self.addData_Window, text='sixth_ingredient: ').grid(row=7, column=0)
-        self.dob = ttk.Entry(self.addData_Window)
-        self.dob.grid(row=7, column=1)
+        ttk.Label(self.addData_Window, text='Sixth Ingredient: ').grid(row=8, column=0)
+        self.sixth_ingredient = ttk.Entry(self.addData_Window)
+        self.sixth_ingredient.grid(row=8, column=1)
 
-        ttk.Label(self.addData_Window, text='Upload Photo').grid(row=8, column=0)
-        self.photo_button = ttk.Button(self.addData_Window, text='Browse', command=lambda: self.add_photo(self.addData_Window)).grid(row=8, column=1)
+        ttk.Label(self.addData_Window, text='Upload Pizza Photo').grid(row=9, column=0)
+        self.photo_button = ttk.Button(self.addData_Window, text='Browse',
+                                       command=lambda: self.add_photo(self.addData_Window)).grid(row=9, column=1)
         self.photo_label = Label(self.addData_Window)
-        self.photo_label.grid(row=9, column=1)
+        self.photo_label.grid(row=10, column=1)
 
-        self.add_button = ttk.Button(self.addData_Window, text='Add Data', command=lambda: self.add_data()).grid(row=10, column=1)
-        ttk.Button(self.addData_Window, text='Close', command=lambda: self.addData_Window.destroy()).grid(row=11, column=1)
+        self.add_button = ttk.Button(self.addData_Window, text='Add Data', command=lambda: self.add_data()).grid(row=11,
+                                                                                                                 column=1)
+        ttk.Button(self.addData_Window, text='Close', command=lambda: self.addData_Window.destroy()).grid(row=12,
+                                                                                                          column=1)
 
     # data add on the listbox and also on database
     def add_data(self):
         try:
-            parameters = (self.id.get(), self.first_name.get(), self.middle_name.get(), self.last_name.get(),
-                          self.address.get(), self.phone_no.get(), self.dob.get(), self.class_name.get(),
-                          self.roll_no.get(), self.gender.get(), self.photo_label['text'].rstrip())
-            print(self.photo_label['text'])
-            self.curs.execute("INSERT INTO Pizzas VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", parameters)
+            parameters = (self.id.get(), self.pizza_name.get(), self.first_ingredient.get(), self.second_ingredient.get(),
+                          self.third_ingredient.get(), self.fourth_ingredient.get(), self.fifth_ingredient.get(), self.sixth_ingredient.get(),
+                          self.photo_label['text'].rstrip())
+            self.curs.execute("INSERT INTO Pizzas VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", parameters)
             self.conn.commit()
-            parameters = (self.id, self.first_name, self.middle_name, self.last_name, self.address, self.phone_no,
-                          self.dob, self.class_name, self.roll_no, self.gender)
+            parameters = (self.id, self.pizza_name, self.first_ingredient, self.second_ingredient, self.third_ingredient, self.fourth_ingredient,
+                          self.fifth_ingredient, self.sixth_ingredient)
             for parameter in parameters:
                 parameter.delete(0, END)
                 parameter.insert(0, '')
-            messagebox.showerror('Pizzas Added', 'Pizzas Added')
+            messagebox.showinfo('Pizza Added', 'Your pizza recipe has been successfully added')
             self.list_all()
         except psycopg2.DataError as e:
             if self.conn:
                 self.conn.rollback()
-            messagebox.showinfo('Error', 'Please enter mandatory fields.')
+            messagebox.showerror('Error', 'Please enter correctly all ingredients')
 
-    # show details of the Pizzas
     def show_data(self):
         self.data_show_window = Toplevel()
         # self.data_show_window.geometry('400x400')
-        self.data_show_window.title('Pizzas Details')
+        self.data_show_window.title('Pizza Details')
         frame = Frame(self.data_show_window, bd=2, relief=SUNKEN)
         frame.grid()
 
         query = self.list_box.get(ACTIVE)
         if not query:
             self.data_show_window.destroy()
-        if query:    
+        if query:
             id = query[0]
-            self.curs.execute("SELECT * FROM Pizzas WHERE pizza_name=(%s)", (id,))
+            self.curs.execute("SELECT * FROM Pizzas WHERE pizza_id=(%s)", (id,))
             rows = self.curs.fetchall()
             for data in rows:
-                if data[10]:
-                    self.image = Image.open(data[10].rstrip())
-                    resized = self.image.resize((200, 200), Image.ANTIALIAS)
+                if data[8]:
+                    self.image = Image.open(data[8].rstrip())
+                    resized = self.image.resize((200, 200), Resampling.LANCZOS)
                     self.photo = ImageTk.PhotoImage(resized)
                     label_image = Label(self.data_show_window, image=self.photo)
                     label_image.grid(row=0, column=1)
 
-                ttk.Label(frame, text='ID*: ').grid(row=1, column=0)
+                ttk.Label(frame, text='Pizza ID: ').grid(row=1, column=0)
                 ttk.Label(frame, text=data[0]).grid(row=1, column=2)
 
-                ttk.Label(frame, text='First Name: ').grid(row=2, column=0)
+                ttk.Label(frame, text='Pizza Name: ').grid(row=2, column=0)
                 ttk.Label(frame, text=data[1]).grid(row=2, column=2)
 
-                ttk.Label(frame, text='Middle Name: ').grid(row=3, column=0)
+                ttk.Label(frame, text='First Ingredient: ').grid(row=3, column=0)
                 ttk.Label(frame, text=data[2]).grid(row=3, column=2)
 
-                ttk.Label(frame, text='Last Name: ').grid(row=4, column=0)
+                ttk.Label(frame, text='Second Ingredient: ').grid(row=4, column=0)
                 ttk.Label(frame, text=data[3]).grid(row=4, column=2)
 
-                ttk.Label(frame, text='Address: ').grid(row=5, column=0)
+                ttk.Label(frame, text='Third Ingredient: ').grid(row=5, column=0)
                 ttk.Label(frame, text=data[4]).grid(row=5, column=2)
 
-                ttk.Label(frame, text='Phone No: ').grid(row=6, column=0)
+                ttk.Label(frame, text='Fourth Ingredient: ').grid(row=6, column=0)
                 ttk.Label(frame, text=data[5]).grid(row=6, column=2)
 
-                ttk.Label(frame, text='DOB*: ').grid(row=7, column=0)
+                ttk.Label(frame, text='Fifth Ingredient: ').grid(row=7, column=0)
                 ttk.Label(frame, text=data[6]).grid(row=7, column=2)
 
-                ttk.Label(frame, text='Class: ').grid(row=8, column=0)
+                ttk.Label(frame, text='Sixth Ingredient: ').grid(row=8, column=0)
                 ttk.Label(frame, text=data[7]).grid(row=8, column=2)
 
-                ttk.Label(frame, text='Roll No: ').grid(row=9, column=0)
-                ttk.Label(frame, text=data[8]).grid(row=9, column=2)
+                ttk.Button(frame, text='Close', command=lambda: self.data_show_window.destroy()).grid(row=9, column=1)
 
-                ttk.Label(frame, text='Gender: ').grid(row=10, column=0)
-                ttk.Label(frame, text=data[9]).grid(row=10, column=2)
-
-                ttk.Button(frame, text='Close', command=lambda: self.data_show_window.destroy()).grid(row=11,
-                                                                                                column=1)
-    
-    # entry of data to update details of the Pizzas
     def update(self):
         self.update_data_window = Toplevel()
-        self.update_data_window.title('Update Pizzas')
+        self.update_data_window.title('Update Pizza informations')
         frame = Frame(self.update_data_window, bd=2, relief=SUNKEN)
         frame.grid()
         query = self.list_box.get(ACTIVE)
         if not query:
             self.update_data_window.destroy()
-        self.pizza_name = query[0]
-        self.curs.execute("SELECT * FROM Pizzas WHERE pizza_name=(%s)", (self.pizza_name,))
+        self.id = query[0]
+        self.curs.execute("SELECT * FROM Pizzas WHERE pizza_id=(%s)", (self.id,))
         rows = self.curs.fetchall()
         for data in rows:
-            if data[10]:
-                self.image = Image.open(data[10].rstrip())
-                resized = self.image.resize((200, 200),Image.ANTIALIAS)
+            if data[8]:
+                self.image = Image.open(data[8].rstrip())
+                resized = self.image.resize((200, 200), Resampling.LANCZOS)
                 self.photo = ImageTk.PhotoImage(resized)
                 label_image = Label(self.update_data_window, image=self.photo)
                 label_image.grid(row=0, column=1)
-            
-            ttk.Label(self.update_data_window, text='Upload Photo').grid(row=10, column=0)
-            self.photo_label = ttk.Label(self.update_data_window, text=data[10])
-            self.photo_label.grid(row=10, column=1)
-            photo_button = ttk.Button(self.update_data_window, text='Browse', command=lambda: self.add_photo(self.update_data_window)).grid(row=1,
-                                                                                                            column=1)
-   
-            ttk.Label(frame, text='ID*').grid(row=0, column=0)
+
+            photo_button = ttk.Button(self.update_data_window, text='Browse',
+                                      command=lambda: self.add_photo(self.update_data_window)).grid(row=1, column=1)
+
+            ttk.Label(frame, text='Pizza ID: ').grid(row=0, column=0)
             self.id1 = ttk.Label(frame)
             self.id1.grid(row=0, column=1)
             self.id1['text'] = data[0]
 
-            ttk.Label(frame, text='First Name').grid(row=1, column=0)
-            self.first_name1 = ttk.Entry(frame)
-            self.first_name1.grid(row=1, column=1)
-            self.first_name1.insert(0, data[1])
+            ttk.Label(frame, text='Pizza Name: ').grid(row=1, column=0)
+            self.pizza_name1 = ttk.Entry(frame)
+            self.pizza_name1.grid(row=1, column=1)
+            self.pizza_name1.insert(0, data[1])
 
-            ttk.Label(frame, text='Middle Name').grid(row=2, column=0)
-            self.middle_name1 = ttk.Entry(frame)
-            self.middle_name1.grid(row=2, column=1)
-            self.middle_name1.insert(0, data[2])
+            ttk.Label(frame, text='First Ingredient: ').grid(row=2, column=0)
+            self.first_ingredient1 = ttk.Entry(frame)
+            self.first_ingredient1.grid(row=2, column=1)
+            self.first_ingredient1.insert(0, data[2])
 
-            ttk.Label(frame, text='Last Name').grid(row=3, column=0)
-            self.last_name1 = ttk.Entry(frame)
-            self.last_name1.grid(row=3, column=1)
-            self.last_name1.insert(0, data[3])
+            ttk.Label(frame, text='Second Ingredient: ').grid(row=3, column=0)
+            self.second_ingredient1 = ttk.Entry(frame)
+            self.second_ingredient1.grid(row=3, column=1)
+            self.second_ingredient1.insert(0, data[3])
 
-            ttk.Label(frame, text='Address').grid(row=4, column=0)
-            self.address1 = ttk.Entry(frame)
-            self.address1.grid(row=4, column=1)
-            self.address1.insert(0, data[4])
+            ttk.Label(frame, text='Third Ingredient: ').grid(row=4, column=0)
+            self.third_ingredient1 = ttk.Entry(frame)
+            self.third_ingredient1.grid(row=4, column=1)
+            self.third_ingredient1.insert(0, data[4])
 
-            ttk.Label(frame, text='Phone No').grid(row=5, column=0)
-            self.phone_no1 = ttk.Entry(frame)
-            self.phone_no1.grid(row=5, column=1)
-            self.phone_no1.insert(0, data[5])
+            ttk.Label(frame, text='Fourth Ingredient: ').grid(row=5, column=0)
+            self.fourth_ingredient1 = ttk.Entry(frame)
+            self.fourth_ingredient1.grid(row=5, column=1)
+            self.fourth_ingredient1.insert(0, data[5])
 
-            ttk.Label(frame, text='DOB*').grid(row=6, column=0)
-            self.dob1 = ttk.Entry(frame)
-            self.dob1.grid(row=6, column=1)
-            self.dob1.insert(0, data[6])
+            ttk.Label(frame, text='Fifth Ingredient: ').grid(row=6, column=0)
+            self.fifth_ingredient1 = ttk.Entry(frame)
+            self.fifth_ingredient1.grid(row=6, column=1)
+            self.fifth_ingredient1.insert(0, data[6])
 
-            ttk.Label(frame, text='Class').grid(row=7, column=0)
-            self.class_name1 = ttk.Entry(frame)
-            self.class_name1.grid(row=7, column=1)
-            self.class_name1.insert(0, data[7])
+            ttk.Label(frame, text='Sixth Ingredient: ').grid(row=7, column=0)
+            self.sixth_ingredient1 = ttk.Entry(frame)
+            self.sixth_ingredient1.grid(row=7, column=1)
+            self.sixth_ingredient1.insert(0, data[7])
 
-            ttk.Label(frame, text='Roll No').grid(row=8, column=0)
-            self.roll_no1 = ttk.Entry(frame)
-            self.roll_no1.grid(row=8, column=1)
-            self.roll_no1.insert(0, data[8])
+            ttk.Label(self.update_data_window, text='Upload Photo').grid(row=8, column=0)
+            self.photo_label = ttk.Label(self.update_data_window, text=data[8])
+            self.photo_label.grid(row=8, column=1)
 
-            ttk.Label(frame, text='Gender').grid(row=9, column=0)
-            self.gender1 = ttk.Entry(frame)
-            self.gender1.grid(row=9, column=1)
-            self.gender1.insert(0, data[9])
+        self.update_button = ttk.Button(frame, text='Update Data', command=lambda: self.update_data()).grid(row=9, column=1)
+        ttk.Button(self.update_data_window, text='Close', command=lambda: self.update_data_window.destroy()).grid(row=10, column=1)
 
-        self.update_button = ttk.Button(frame, text='Update Data', command=lambda: self.update_data()).grid(row=11,
-                                                                                 column=1)
-        ttk.Button(self.update_data_window, text='Close', command=lambda: self.update_data_window.destroy()).grid(
-            row=12, column=1)
-
-    # update the details of the Pizzas on the list box and also database
     def update_data(self):
-        update_values = (self.first_name1.get(), self.middle_name1.get(), self.last_name1.get(),
-                         self.address1.get(), self.phone_no1.get(), self.dob1.get(), self.class_name1.get(),
-                         self.roll_no1.get(), self.gender1.get(), self.photo_label['text'].rstrip(), self.pizza_name)
-        self.curs.execute("UPDATE Pizzas SET first_name=%s, middle_name=%s, last_name=%s, address=%s, phone_no=%s, "
-                          "dob=%s, class=%s, rollno=%s, gender=%s, photo=%s WHERE pizza_name=%s", update_values)
+        update_values = (self.pizza_name1.get(), self.first_ingredient1.get(), self.second_ingredient1.get(),
+                         self.third_ingredient1.get(), self.fourth_ingredient1.get(), self.fifth_ingredient1.get(), self.sixth_ingredient1.get(),
+                         self.photo_label['text'].rstrip(), self.id)
+        self.curs.execute("UPDATE Pizzas SET pizza_name=(%s), first_ingredient=(%s), second_ingredient=(%s), "
+                          "third_ingredient=(%s), fourth_ingredient=(%s), "
+                          "fifth_ingredient=(%s), sixth_ingredient=(%s), photo=(%s) WHERE pizza_id=(%s)", update_values)
         self.conn.commit()
         self.list_all()
-        self.curs.execute("SELECT * FROM Pizzas WHERE pizza_name=(%s)", (self.pizza_name,))
+        self.curs.execute("SELECT * FROM Pizzas WHERE pizza_id=(%s)", (self.id,))
         rows = self.curs.fetchall()
         for data in rows:
             self.id1['text'] = ''
             self.id1['text'] = data[0]
-            self.first_name1.delete(0, END)
-            self.first_name1.insert(0, data[1])
-            self.middle_name1.delete(0, END)
-            self.middle_name1.insert(0, data[2])
-            self.last_name1.delete(0, END)
-            self.last_name1.insert(0, data[3])
-            self.address1.delete(0, END)
-            self.address1.insert(0, data[4])
-            self.phone_no1.delete(0, END)
-            self.phone_no1.insert(0, data[5])
-            self.dob1.delete(0, END)
-            self.dob1.insert(0, data[6])
-            self.class_name1.delete(0, END)
-            self.class_name1.insert(0, data[7])
-            self.roll_no1.delete(0, END)
-            self.roll_no1.insert(0, data[8])
-            self.gender1.delete(0, END)
-            self.gender1.insert(0, data[9])
-            
-            self.image = Image.open(data[10].rstrip())
-            resized = self.image.resize((200, 200),Image.ANTIALIAS)
+            self.pizza_name1.delete(0, END)
+            self.pizza_name1.insert(0, data[1])
+            self.first_ingredient1.delete(0, END)
+            self.first_ingredient1.insert(0, data[2])
+            self.second_ingredient1.delete(0, END)
+            self.second_ingredient1.insert(0, data[3])
+            self.third_ingredient1.delete(0, END)
+            self.third_ingredient1.insert(0, data[4])
+            self.fourth_ingredient1.delete(0, END)
+            self.fourth_ingredient1.insert(0, data[5])
+            self.fifth_ingredient1.delete(0, END)
+            self.fifth_ingredient1.insert(0, data[6])
+            self.sixth_ingredient1.delete(0, END)
+            self.sixth_ingredient1.insert(0, data[7])
+
+            self.image = Image.open(data[8].rstrip())
+            resized = self.image.resize((200, 200), Resampling.LANCZOS)
             self.photo = ImageTk.PhotoImage(resized)
 
             label_image = Label(self.update_data_window, image=self.photo)
             label_image.grid(row=0, column=1)
 
-            messagebox.showinfo('Pizzas Updated',
-                                self.first_name1.get() + self.middle_name1.get() + self.last_name1.get() + ' Updated')
+            messagebox.showinfo('Pizzas Updated', 'The pizza ' + self.pizza_name1.get() + ' is updated')
 
     # close database connection
     def close_connection(self, window):
         self.curs.close()
         del self.curs
         self.conn.close()  # <--- Close the connection
-        # if self.update_data_window or self.data_show_window or self.addData_Window:
-        #     self.update_data_window.destroy()
-        #     self.data_show_window.destroy()
-        #     self.addData_Window.destroy()
+        if self.update_data_window or self.data_show_window or self.addData_Window:
+            self.update_data_window.destroy()
+            self.data_show_window.destroy()
+            self.addData_Window.destroy()
         window.destroy()
 
     def add_photo(self, window):
-        filename = filedialog.askopenfilename(initialdir="/", title="Select file",
-                                                   filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+        filename = filedialog.askopenfilename(initialdir="/", title="Select file", filetypes=(("png files", "*.png"), ("all files", "*.*")))
         self.photo_label['text'] = filename
-        
+
         self.image = Image.open(self.photo_label['text'].rstrip())
-        resized = self.image.resize((200, 200),Image.ANTIALIAS)
+        resized = self.image.resize((200, 200), Resampling.LANCZOS)
         self.photo = ImageTk.PhotoImage(resized)
         label_image = Label(window, image=self.photo)
         label_image.grid(row=0, column=1)

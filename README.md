@@ -4,6 +4,10 @@ The goal of this Python Application would be to display and select pizza combina
 Meet now: "The Ultimate Pizza Selector".
 
 
+Note that the program "table_injector.py" is executed also in "Pizza_Database_Project.py".
+In the case where you want only to deploy the DB, just execute "table_injector.py".
+
+
 
 # REQUIERED LIBRARIES PYTHON
 python -m pip install psycopg2-binary Pillow
@@ -12,7 +16,6 @@ python -m pip install psycopg2-binary Pillow
 
 # POSTGRESQL V14 INSTALL
 http://sbp.enterprisedb.com/getfile.jsp?fileid=1258098
-
 
 
 
