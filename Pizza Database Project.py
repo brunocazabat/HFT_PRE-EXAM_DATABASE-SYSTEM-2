@@ -30,38 +30,19 @@ class DatabaseProject:
         style = ttk.Style()
         style.configure("TButton", font="Serif 10", padding=10)
         style.configure("TEntry", font="Serif 10", padding=10)
-        rightFrame = Frame(window)
-        leftFrame = Frame(window)
-        rightFrame.pack(side=LEFT)
 
-        ttk.Label(window, text="Ingredient List        ").pack(anchor=NE)
-        ttk.Label(window, text="        Pizzas List").pack(anchor=NW)
+        bottomFrame = Frame(window)
+        bottomFrame.pack(side=BOTTOM)
 
-        self.list_box = Listbox(window, selectmode=EXTENDED, width=50)
-        self.list_box.pack(anchor=NW)
+        ttk.Label(window, text="Pizzas List").pack()
+        self.list_box = Listbox(window, selectmode=EXTENDED, width=65)
+        self.list_box.pack()
         self.list_all_pizzas()
 
-        self.list_box = Listbox(window, selectmode=EXTENDED, width=50)
-        self.list_box.pack(anchor=NE)
-        self.list_all_ing()
-
         self.Pizzas_button = ttk.Button(window, text='Add a pizza', command=lambda: self.enter_data()).pack(side=LEFT)
-        self.show_button = ttk.Button(window, text='Show pizza details', command=lambda: self.show_data()).pack(
-            side=LEFT)
-        self.delete_button = ttk.Button(window, text='Delete pizza', command=lambda: self.delete_data()).pack(
-            side=LEFT)
-        self.update_button = ttk.Button(window, text='Update pizza list', command=lambda: self.update()).pack(
-            side=LEFT)
-
-        self.Pizzas_button = ttk.Button(window, text='Add an ingredient', command=lambda: self.enter_data()).pack(
-            side=RIGHT)
-        self.show_button = ttk.Button(window, text='Show ingredient details', command=lambda: self.show_data()).pack(
-            side=RIGHT)
-        self.delete_button = ttk.Button(window, text='Delete ingredient', command=lambda: self.delete_data()).pack(
-            side=RIGHT)
-        self.update_button = ttk.Button(window, text='Update ingredient list', command=lambda: self.update()).pack(
-            side=RIGHT)
-
+        self.show_button = ttk.Button(window, text='Show pizza details', command=lambda: self.show_data()).pack(side=LEFT)
+        self.delete_button = ttk.Button(window, text='Delete pizza', command=lambda: self.delete_data()).pack(side=RIGHT)
+        self.update_button = ttk.Button(window, text='Update pizza list', command=lambda: self.update()).pack(side=RIGHT)
         ttk.Button(bottomFrame, text='Close', command=lambda: self.close_connection(window)).pack()
 
     # list all data in listbox
@@ -160,7 +141,7 @@ class DatabaseProject:
                 parameter.delete(0, END)
                 parameter.insert(0, '')
             messagebox.showinfo('Pizza Added', 'Your pizza recipe has been successfully added')
-            self.list_all()
+            self.list_all_pizzas()
         except psycopg2.DataError as e:
             if self.conn:
                 self.conn.rollback()
@@ -294,7 +275,7 @@ class DatabaseProject:
                           "third_ingredient=(%s), fourth_ingredient=(%s), "
                           "fifth_ingredient=(%s), sixth_ingredient=(%s), photo=(%s) WHERE pizza_id=(%s)", update_values)
         self.conn.commit()
-        self.list_all()
+        self.list_all_pizzas()
         self.curs.execute("SELECT * FROM Pizzas WHERE pizza_id=(%s)", (self.id,))
         rows = self.curs.fetchall()
         for data in rows:
