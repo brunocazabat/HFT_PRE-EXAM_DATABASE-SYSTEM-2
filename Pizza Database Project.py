@@ -26,31 +26,58 @@ class DatabaseProject:
 
         # configure window, buttons and Entry
         window.title('The Ultimate Pizza Selector')
-        window.geometry('450x450')
+        window.geometry('650x400')
         style = ttk.Style()
         style.configure("TButton", font="Serif 10", padding=10)
         style.configure("TEntry", font="Serif 10", padding=10)
-        bottomFrame = Frame(window)
-        bottomFrame.pack(side=BOTTOM)
+        rightFrame = Frame(window)
+        leftFrame = Frame(window)
+        rightFrame.pack(side=LEFT)
 
-        ttk.Label(window, text="Pizzas List").pack()
-        self.list_box = Listbox(window, selectmode=EXTENDED, width=65)
-        self.list_box.pack()
-        self.list_all()
+        ttk.Label(window, text="Ingredient List        ").pack(anchor=NE)
+        ttk.Label(window, text="        Pizzas List").pack(anchor=NW)
+
+        self.list_box = Listbox(window, selectmode=EXTENDED, width=50)
+        self.list_box.pack(anchor=NW)
+        self.list_all_pizzas()
+
+        self.list_box = Listbox(window, selectmode=EXTENDED, width=50)
+        self.list_box.pack(anchor=NE)
+        self.list_all_ing()
 
         self.Pizzas_button = ttk.Button(window, text='Add a pizza', command=lambda: self.enter_data()).pack(side=LEFT)
-        self.show_button = ttk.Button(window, text='Show pizza details', command=lambda: self.show_data()).pack(side=LEFT)
-        self.delete_button = ttk.Button(window, text='Delete pizza', command=lambda: self.delete_data()).pack(side=RIGHT)
-        self.update_button = ttk.Button(window, text='Update pizza list', command=lambda: self.update()).pack(side=RIGHT)
+        self.show_button = ttk.Button(window, text='Show pizza details', command=lambda: self.show_data()).pack(
+            side=LEFT)
+        self.delete_button = ttk.Button(window, text='Delete pizza', command=lambda: self.delete_data()).pack(
+            side=LEFT)
+        self.update_button = ttk.Button(window, text='Update pizza list', command=lambda: self.update()).pack(
+            side=LEFT)
+
+        self.Pizzas_button = ttk.Button(window, text='Add an ingredient', command=lambda: self.enter_data()).pack(
+            side=RIGHT)
+        self.show_button = ttk.Button(window, text='Show ingredient details', command=lambda: self.show_data()).pack(
+            side=RIGHT)
+        self.delete_button = ttk.Button(window, text='Delete ingredient', command=lambda: self.delete_data()).pack(
+            side=RIGHT)
+        self.update_button = ttk.Button(window, text='Update ingredient list', command=lambda: self.update()).pack(
+            side=RIGHT)
+
         ttk.Button(bottomFrame, text='Close', command=lambda: self.close_connection(window)).pack()
 
     # list all data in listbox
-    def list_all(self):
+    def list_all_pizzas(self):
         self.curs.execute("SELECT * FROM Pizzas")
         self.list_box.delete(0, END)
         rows = self.curs.fetchall()
         for row in rows:
-            self.list_box.insert(0, str(row[0]) + ': ' + row[1] + ' ' + row[2] + ' ' + row[3])
+            self.list_box.insert(0, 'N° ' + str(row[0]) + ' : ' + row[1] + ' pizza')
+
+    def list_all_ing(self):
+        self.curs.execute("SELECT * FROM ingredients")
+        self.list_box.delete(0, END)
+        rows = self.curs.fetchall()
+        for row in rows:
+            self.list_box.insert(0, 'N° ' + str(row[0]) + ': ' + row[1])
 
     # delete data from database and listbox
     def delete_data(self):
@@ -118,13 +145,17 @@ class DatabaseProject:
     # data add on the listbox and also on database
     def add_data(self):
         try:
-            parameters = (self.id.get(), self.pizza_name.get(), self.first_ingredient.get(), self.second_ingredient.get(),
-                          self.third_ingredient.get(), self.fourth_ingredient.get(), self.fifth_ingredient.get(), self.sixth_ingredient.get(),
-                          self.photo_label['text'].rstrip())
+            parameters = (
+            self.id.get(), self.pizza_name.get(), self.first_ingredient.get(), self.second_ingredient.get(),
+            self.third_ingredient.get(), self.fourth_ingredient.get(), self.fifth_ingredient.get(),
+            self.sixth_ingredient.get(),
+            self.photo_label['text'].rstrip())
             self.curs.execute("INSERT INTO Pizzas VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", parameters)
             self.conn.commit()
-            parameters = (self.id, self.pizza_name, self.first_ingredient, self.second_ingredient, self.third_ingredient, self.fourth_ingredient,
-                          self.fifth_ingredient, self.sixth_ingredient)
+            parameters = (
+            self.id, self.pizza_name, self.first_ingredient, self.second_ingredient, self.third_ingredient,
+            self.fourth_ingredient,
+            self.fifth_ingredient, self.sixth_ingredient)
             for parameter in parameters:
                 parameter.delete(0, END)
                 parameter.insert(0, '')
@@ -249,12 +280,15 @@ class DatabaseProject:
             self.photo_label = ttk.Label(self.update_data_window, text=data[8])
             self.photo_label.grid(row=8, column=1)
 
-        self.update_button = ttk.Button(frame, text='Update Data', command=lambda: self.update_data()).grid(row=9, column=1)
-        ttk.Button(self.update_data_window, text='Close', command=lambda: self.update_data_window.destroy()).grid(row=10, column=1)
+        self.update_button = ttk.Button(frame, text='Update Data', command=lambda: self.update_data()).grid(row=9,
+                                                                                                            column=1)
+        ttk.Button(self.update_data_window, text='Close', command=lambda: self.update_data_window.destroy()).grid(
+            row=10, column=1)
 
     def update_data(self):
         update_values = (self.pizza_name1.get(), self.first_ingredient1.get(), self.second_ingredient1.get(),
-                         self.third_ingredient1.get(), self.fourth_ingredient1.get(), self.fifth_ingredient1.get(), self.sixth_ingredient1.get(),
+                         self.third_ingredient1.get(), self.fourth_ingredient1.get(), self.fifth_ingredient1.get(),
+                         self.sixth_ingredient1.get(),
                          self.photo_label['text'].rstrip(), self.id)
         self.curs.execute("UPDATE Pizzas SET pizza_name=(%s), first_ingredient=(%s), second_ingredient=(%s), "
                           "third_ingredient=(%s), fourth_ingredient=(%s), "
@@ -302,7 +336,8 @@ class DatabaseProject:
         window.destroy()
 
     def add_photo(self, window):
-        filename = filedialog.askopenfilename(initialdir="/", title="Select file", filetypes=(("png files", "*.png"), ("all files", "*.*")))
+        filename = filedialog.askopenfilename(initialdir="/", title="Select file",
+                                              filetypes=(("png files", "*.png"), ("all files", "*.*")))
         self.photo_label['text'] = filename
 
         self.image = Image.open(self.photo_label['text'].rstrip())
