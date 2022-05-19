@@ -3,6 +3,8 @@ from tkinter import *
 from tkinter import ttk, messagebox, filedialog
 from PIL import Image, ImageTk
 from PIL.Image import Resampling
+from src_piz import list_all_piz
+from src_ing import list_all_ing
 
 
 class DatabaseProject:
@@ -36,7 +38,7 @@ class DatabaseProject:
         ttk.Label(window, text="Pizzas List").pack()
         self.list_box = Listbox(window, selectmode=EXTENDED, width=65)
         self.list_box.pack()
-        self.list_all()
+        self.list_all_piz()
 
         self.Pizzas_button = ttk.Button(window, text='Add a pizza', command=lambda: self.enter_data()).pack(side=LEFT)
         self.show_button = ttk.Button(window, text='Show pizza details', command=lambda: self.show_data()).pack(side=LEFT)
@@ -45,7 +47,7 @@ class DatabaseProject:
         ttk.Button(bottomFrame, text='Close', command=lambda: self.close_connection(window)).pack()
 
     # list all data in listbox
-    def list_all(self):
+    def list_all_piz(self):
         self.curs.execute("SELECT * FROM Pizzas")
         self.list_box.delete(0, END)
         rows = self.curs.fetchall()
@@ -129,7 +131,7 @@ class DatabaseProject:
                 parameter.delete(0, END)
                 parameter.insert(0, '')
             messagebox.showinfo('Pizza Added', 'Your pizza recipe has been successfully added')
-            self.list_all()
+            self.list_all_piz()
         except psycopg2.DataError as e:
             if self.conn:
                 self.conn.rollback()
@@ -260,7 +262,7 @@ class DatabaseProject:
                           "third_ingredient=(%s), fourth_ingredient=(%s), "
                           "fifth_ingredient=(%s), sixth_ingredient=(%s), photo=(%s) WHERE pizza_id=(%s)", update_values)
         self.conn.commit()
-        self.list_all()
+        self.list_all_piz()
         self.curs.execute("SELECT * FROM Pizzas WHERE pizza_id=(%s)", (self.id,))
         rows = self.curs.fetchall()
         for data in rows:
