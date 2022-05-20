@@ -6,7 +6,7 @@ from src_ing import list_all_ing, delete_data_ing, enter_data_ing, show_data_ing
 from src_utils import close_connection
 
 
-class DatabaseProject:
+class MainDatabaseProject:
     update_data_window = None
     data_show_window = None
     addData_Window = None
@@ -48,5 +48,5 @@ class DatabaseProject:
 
 if __name__ == '__main__':
     root = Tk()
-    data = DatabaseProject(root)
+    data = MainDatabaseProject(root)
     root.mainloop()
