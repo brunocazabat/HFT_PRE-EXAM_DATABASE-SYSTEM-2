@@ -1,8 +1,8 @@
 import psycopg2
 from tkinter import *
 from tkinter import ttk, messagebox
-from src_ing import list_all_ing
-from src_utils import add_photo
+from src.Ingredients import list_all_ing
+from src.Utils import add_photo
 
 
 # enter data on entry boxes
@@ -10,7 +10,7 @@ def enter_data_ing(self, list_box):
     self.addData_Window = Toplevel()
     self.addData_Window.title('Add Ingredients Data')
 
-    self.curs.execute("SELECT * FROM ingredients")
+    self.curs.execute("SELECT * FROM Ingredients")
     value = str(len(self.curs.fetchall()) + 1)
 
     ttk.Label(self.addData_Window, text='Ingredient ID: ').grid(row=1, column=0)
@@ -37,7 +37,7 @@ def enter_data_ing(self, list_box):
 def add_data_ing(self, list_box):
     try:
         parameters = (self.id.get(), self.ingredient_name.get(), self.photo_label['text'].rstrip())
-        self.curs.execute("INSERT INTO ingredients VALUES (%s, %s, %s)", parameters)
+        self.curs.execute("INSERT INTO Ingredients VALUES (%s, %s, %s)", parameters)
         self.conn.commit()
         parameters = (self.id, self.ingredient_name)
         for parameter in parameters:

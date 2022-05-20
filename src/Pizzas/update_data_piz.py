@@ -2,8 +2,8 @@ from tkinter import *
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from PIL.Image import Resampling
-from src_piz import list_all_piz
-from src_utils import add_photo
+from src.Pizzas import list_all_piz
+from src.Utils import add_photo
 
 
 # update all data in database

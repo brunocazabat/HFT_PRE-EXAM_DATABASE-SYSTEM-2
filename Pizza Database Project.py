@@ -1,6 +1,7 @@
 import psycopg2
 from tkinter import *
-from src_ui import column_row_gen, pizzas_left_side, ingre_right_side, close_and_style
+from src.UserInterface import pizzas_left_side, ingre_right_side, close_and_style
+from src.UserInterface import column_row_gen
 
 
 class MainDatabaseProject(Frame):

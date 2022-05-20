@@ -1,5 +1,5 @@
 from tkinter import ttk
-from src_utils import close_connection
+from src.Utils import close_connection
 
 
 # add additional style rules and add the close button

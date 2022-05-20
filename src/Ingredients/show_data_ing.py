@@ -16,7 +16,7 @@ def show_data_ing(self, list_box):
         self.data_show_window.destroy()
     if query:
         ing_id = query[3]
-        self.curs.execute("SELECT * FROM ingredients WHERE ingredient_id=(%s)", (ing_id,))
+        self.curs.execute("SELECT * FROM Ingredients WHERE ingredient_id=(%s)", (ing_id,))
         rows = self.curs.fetchall()
         for data in rows:
             if data[2]:

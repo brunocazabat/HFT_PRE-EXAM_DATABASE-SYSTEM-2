@@ -1,8 +1,8 @@
 import psycopg2
 from tkinter import *
 from tkinter import ttk, messagebox
-from src_piz import list_all_piz
-from src_utils import add_photo
+from src.Pizzas import list_all_piz
+from src.Utils import add_photo
 
 
 # enter data on entry boxes
@@ -74,4 +74,4 @@ def add_data_piz(self, list_box):
     except psycopg2.DataError as e:
         if self.conn:
             self.conn.rollback()
-        messagebox.showerror('Error', 'Please enter correctly all ingredients')
+        messagebox.showerror('Error', 'Please enter correctly all Ingredients')

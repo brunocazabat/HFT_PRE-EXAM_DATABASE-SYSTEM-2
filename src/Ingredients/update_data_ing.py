@@ -2,17 +2,17 @@ from tkinter import *
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 from PIL.Image import Resampling
-from src_ing import list_all_ing
-from src_utils import add_photo
+from src.Ingredients import list_all_ing
+from src.Utils import add_photo
 
 
 # update all data in database
 def update_ing(self, list_box):
     update_values = (self.ingredient_name1.get(), self.photo_label['text'].rstrip(), self.id)
-    self.curs.execute("UPDATE ingredients SET ingredient_name=(%s), photo=(%s) WHERE ingredient_id=(%s)", update_values)
+    self.curs.execute("UPDATE Ingredients SET ingredient_name=(%s), photo=(%s) WHERE ingredient_id=(%s)", update_values)
     self.conn.commit()
     list_all_ing.list_all_ing(self, list_box)
-    self.curs.execute("SELECT * FROM ingredients WHERE ingredient_id=(%s)", (self.id,))
+    self.curs.execute("SELECT * FROM Ingredients WHERE ingredient_id=(%s)", (self.id,))
     rows = self.curs.fetchall()
     for data in rows:
         self.id1['text'] = ''
@@ -40,7 +40,7 @@ def update_data_ing(self, list_box):
     if not query:
         self.update_data_window.destroy()
     self.id = query[3]
-    self.curs.execute("SELECT * FROM ingredients WHERE ingredient_id=(%s)", (self.id,))
+    self.curs.execute("SELECT * FROM Ingredients WHERE ingredient_id=(%s)", (self.id,))
     rows = self.curs.fetchall()
     for data in rows:
         if data[2]:

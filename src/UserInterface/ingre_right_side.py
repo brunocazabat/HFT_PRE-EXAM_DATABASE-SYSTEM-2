@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-from src_ing import list_all_ing, delete_data_ing, enter_data_ing, show_data_ing, update_data_ing
+from src.Ingredients import list_all_ing, delete_data_ing, enter_data_ing, show_data_ing
+from src.Ingredients import update_data_ing
 
 
 # generate all right side of the UI

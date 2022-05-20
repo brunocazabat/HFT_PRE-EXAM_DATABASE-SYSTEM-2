@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from src_piz import list_all_piz, delete_data_piz, enter_data_piz, show_data_piz, update_data_piz
+from src.Pizzas import show_data_piz, update_data_piz, delete_data_piz, enter_data_piz, list_all_piz
 
 
 # generate all left side of the UI
