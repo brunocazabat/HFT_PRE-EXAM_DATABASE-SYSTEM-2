@@ -5,18 +5,18 @@ from PIL.Image import Resampling
 
 
 # show all data in database
-def show_data_piz(self):
+def show_data_piz(self, list_box):
     self.data_show_window = Toplevel()
     self.data_show_window.title('Pizza Details')
     frame = Frame(self.data_show_window, bd=2, relief=SUNKEN)
     frame.grid()
 
-    query = self.list_box.get(ACTIVE)
+    query = list_box.get(ACTIVE)
     if not query:
         self.data_show_window.destroy()
     if query:
-        id = query[3]
-        self.curs.execute("SELECT * FROM Pizzas WHERE pizza_id=(%s)", (id,))
+        piz_id = query[3]
+        self.curs.execute("SELECT * FROM Pizzas WHERE pizza_id=(%s)", (piz_id,))
         rows = self.curs.fetchall()
         for data in rows:
             if data[8]:

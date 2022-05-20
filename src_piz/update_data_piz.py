@@ -7,7 +7,7 @@ from src_utils import add_photo
 
 
 # update all data in database
-def update_piz(self):
+def update_piz(self, list_box):
     update_values = (self.pizza_name1.get(), self.first_ingredient1.get(), self.second_ingredient1.get(),
                      self.third_ingredient1.get(), self.fourth_ingredient1.get(), self.fifth_ingredient1.get(),
                      self.sixth_ingredient1.get(),
@@ -16,7 +16,7 @@ def update_piz(self):
                       "third_ingredient=(%s), fourth_ingredient=(%s), "
                       "fifth_ingredient=(%s), sixth_ingredient=(%s), photo=(%s) WHERE pizza_id=(%s)", update_values)
     self.conn.commit()
-    list_all_piz.list_all_piz(self)
+    list_all_piz.list_all_piz(self, list_box)
     self.curs.execute("SELECT * FROM Pizzas WHERE pizza_id=(%s)", (self.id,))
     rows = self.curs.fetchall()
     for data in rows:
@@ -48,12 +48,12 @@ def update_piz(self):
 
 
 # update all data in database
-def update_data_piz(self):
+def update_data_piz(self, list_box):
     self.update_data_window = Toplevel()
     self.update_data_window.title('Update Pizza information')
     frame = Frame(self.update_data_window, bd=2, relief=SUNKEN)
     frame.grid()
-    query = self.list_box.get(ACTIVE)
+    query = list_box.get(ACTIVE)
     if not query:
         self.update_data_window.destroy()
     self.id = query[3]
@@ -67,9 +67,8 @@ def update_data_piz(self):
             label_image = Label(self.update_data_window, image=self.photo)
             label_image.grid(row=0, column=1)
 
-        photo_button = ttk.Button(self.update_data_window, text='Browse',
-                                  command=lambda: add_photo.add_photo(self, self.update_data_window)).grid(row=1,
-                                                                                                           column=1)
+        ttk.Button(self.update_data_window, text='Browse',
+                   command=lambda: add_photo.add_photo(self, self.update_data_window)).grid(row=1, column=1)
 
         ttk.Label(frame, text='Pizza ID: ').grid(row=0, column=0)
         self.id1 = ttk.Label(frame)
@@ -115,7 +114,7 @@ def update_data_piz(self):
         self.photo_label = ttk.Label(self.update_data_window, text=data[8])
         self.photo_label.grid(row=8, column=1)
 
-    self.update_button = ttk.Button(frame, text='Update Data', command=lambda: update_piz(self)).grid(row=9,
-                                                                                                      column=1)
+    self.update_button = ttk.Button(frame, text='Update Data', command=lambda: update_piz(self, list_box)).grid(row=9,
+                                                                                                                column=1)
     ttk.Button(self.update_data_window, text='Close', command=lambda: self.update_data_window.destroy()).grid(row=10,
                                                                                                               column=1)
