@@ -2,6 +2,7 @@ from tkinter import ttk
 from src_utils import close_connection
 
 
+# add additional style rules and add the close button
 def close_and_style(self):
     style = ttk.Style()
     style.configure("TButton", font="Serif 10", padding=10)

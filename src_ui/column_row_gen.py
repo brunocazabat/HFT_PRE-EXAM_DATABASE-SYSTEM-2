@@ -1,3 +1,4 @@
+# Generate all the grid system
 def column_row_gen(self):
     self.columnconfigure(0, pad=7, weight=1)
     self.columnconfigure(1, pad=7, weight=1)

@@ -3,6 +3,7 @@ from tkinter import ttk
 from src_ing import list_all_ing, delete_data_ing, enter_data_ing, show_data_ing, update_data_ing
 
 
+# generate all right side of the UI
 def ingre_right_side(self):
     ing_lbl = ttk.Label(self, text="Ingredients List")
     ing_lbl.grid(row=0, column=5, padx=5)

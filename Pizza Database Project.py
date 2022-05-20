@@ -28,6 +28,7 @@ class MainDatabaseProject(Frame):
         # configure self, buttons and Entry
         self.master.title('The Ultimate Pizza Selector')
 
+        # generate all UI
         column_row_gen.column_row_gen(self)
         pizzas_left_side.pizzas_left_side(self)
         ingre_right_side.ingre_right_side(self)

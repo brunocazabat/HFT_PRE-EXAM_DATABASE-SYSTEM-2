@@ -3,6 +3,7 @@ from tkinter import ttk
 from src_piz import list_all_piz, delete_data_piz, enter_data_piz, show_data_piz, update_data_piz
 
 
+# generate all left side of the UI
 def pizzas_left_side(self):
     piz_lbl = ttk.Label(self, text="Pizzas List")
     piz_lbl.grid(row=0, column=0, padx=5)
