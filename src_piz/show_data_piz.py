@@ -1,9 +1,12 @@
+from tkinter import *
+from tkinter import ttk
+from PIL import Image, ImageTk
+from PIL.Image import Resampling
 
 
-
+# show all data in database
 def show_data_piz(self):
     self.data_show_window = Toplevel()
-    # self.data_show_window.geometry('400x400')
     self.data_show_window.title('Pizza Details')
     frame = Frame(self.data_show_window, bd=2, relief=SUNKEN)
     frame.grid()

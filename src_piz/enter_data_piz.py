@@ -2,12 +2,12 @@ import psycopg2
 from tkinter import *
 from tkinter import ttk, messagebox
 from src_piz import list_all_piz
+from src_utils import add_photo
 
 
 # enter data on entry boxes
 def enter_data_piz(self):
     self.addData_Window = Toplevel()
-    # self.addData_Window.geometry('800x400')
     self.addData_Window.title('Add Pizzas Data')
 
     self.curs.execute("SELECT * FROM Pizzas")
@@ -45,15 +45,14 @@ def enter_data_piz(self):
     ttk.Label(self.addData_Window, text='Sixth Ingredient: ').grid(row=8, column=0)
     self.sixth_ingredient = ttk.Entry(self.addData_Window)
     self.sixth_ingredient.grid(row=8, column=1)
-
     ttk.Label(self.addData_Window, text='Upload Pizza Photo').grid(row=9, column=0)
     self.photo_button = ttk.Button(self.addData_Window, text='Browse',
-                                   command=lambda: self.add_photo(self.addData_Window)).grid(row=9, column=1)
+                                   command=lambda: add_photo.add_photo(self, self.addData_Window)).grid(row=9, column=1)
     self.photo_label = Label(self.addData_Window)
     self.photo_label.grid(row=10, column=1)
 
     self.add_button = ttk.Button(self.addData_Window, text='Add Data', command=lambda: add_data_piz(self)).grid(row=11,
-                                                                                                             column=1)
+                                                                                                                column=1)
     ttk.Button(self.addData_Window, text='Close', command=lambda: self.addData_Window.destroy()).grid(row=12,
                                                                                                       column=1)
 
@@ -63,13 +62,11 @@ def add_data_piz(self):
     try:
         parameters = (self.id.get(), self.pizza_name.get(), self.first_ingredient.get(), self.second_ingredient.get(),
                       self.third_ingredient.get(), self.fourth_ingredient.get(), self.fifth_ingredient.get(),
-                      self.sixth_ingredient.get(),
-                      self.photo_label['text'].rstrip())
+                      self.sixth_ingredient.get(), self.photo_label['text'].rstrip())
         self.curs.execute("INSERT INTO Pizzas VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", parameters)
         self.conn.commit()
         parameters = (self.id, self.pizza_name, self.first_ingredient, self.second_ingredient, self.third_ingredient,
-                      self.fourth_ingredient,
-                      self.fifth_ingredient, self.sixth_ingredient)
+                      self.fourth_ingredient, self.fifth_ingredient, self.sixth_ingredient)
         for parameter in parameters:
             parameter.delete(0, END)
             parameter.insert(0, '')
